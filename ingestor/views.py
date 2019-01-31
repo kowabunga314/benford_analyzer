@@ -26,10 +26,12 @@ def analyze(request):
 def import_values(column, separator, file):
     # Open file for reading
     with open(file, 'r') as file:
+        # Skip header row
+        next(file)
         # Read file into DB line-by-line
         for line in file:
             # Grab the value from specified column
-            value = line.split(separator)[column]
+            value = line.split(separator)[column].strip()
             i_ser = IngestorSerializer(data={'value': value})
 
             # Validate data prior to saving to DB
@@ -52,13 +54,25 @@ def analyze_values(values):
         else:                           # No value exists for this key
             data[leading_digit] = 1
 
+    return get_formatted_response(data)
+
 
 def get_formatted_response(data):
+    total = Ingestor.objects.all().count()
+    # Set basic format for return
     return_value = {
-        'digit_distribution': [
-            {}
-        ]
+        'digit_distribution': []
     }
+
+    # Iterate through keys in given dict
+    for key in data:
+        return_value['digit_distribution'].append({
+            'digit': key,
+            'count': data[key],
+            'percent': round(data[key]/total*100, 2)
+        })
+
+    return return_value
 
 
 def get_msd(num):
