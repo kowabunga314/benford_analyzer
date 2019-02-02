@@ -23,13 +23,13 @@ class Benford(APIView):
     def analyze(self):
         # Clear database for clean run
         Ingestor.objects.all().delete()
+
+        # Serialize and validate input data
         data = {'column': self.POST['column'], 'separator': self.POST['separator'], 'file': self.FILES['file']}
         b_ser = BenfordRequestSerializer(data=data)
 
         if b_ser.is_valid():
             br = b_ser.save()
-            # br.file = self.FILES['file']
-            # br.save()
         else:
             return JsonResponse({'message': 'Failed to parse file data. Please verify correct column and separator '
                                             'values'}, status=400)
@@ -41,10 +41,19 @@ class Benford(APIView):
             return JsonResponse({'message': 'Failed to parse file data. Please verify correct column and separator '
                                             'values'}, status=400)
         except Exception as e:
+            # Using broad exception class here for debugging. More specific exception handling can be
+            # implemented after testing
             return JsonResponse({'message': e.__str__()}, status=400)
 
         # Analyze imported values
-        return JsonResponse(Benford.generate_response(br))
+        try:
+            response = Benford.generate_response(br)
+        except Exception as e:
+            # Using broad exception class here for debugging. More specific exception handling can be
+            # implemented after testing
+            return JsonResponse({'message': e.__str__()}, status=500)
+
+        return JsonResponse(response)
 
     @staticmethod
     def import_values(br):
@@ -103,7 +112,3 @@ class Benford(APIView):
         }
 
         return response_data
-
-    @staticmethod
-    def get_sep_str(separator):
-        pass
