@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from ingestor.views import Benford
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('benford-distribution', Benford.analyze, name='benford_distribution')
 ]
