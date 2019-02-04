@@ -1,15 +1,12 @@
 from math import floor, log10
 from django.db import models
 from rest_framework.compat import MinValueValidator
+from ingestor.config import SEP_CHOICES
 
 
 class BenfordRequest(models.Model):
     column = models.IntegerField(null=False, blank=False)
-    separator = models.CharField(null=False, blank=False, max_length=12, choices=(
-        ('comma', ','),
-        ('tab', '\t'),
-        ('pipe', '|'),
-    ))
+    separator = models.CharField(null=False, blank=False, max_length=12, choices=SEP_CHOICES)
     file = models.FileField()
 
 

@@ -1,0 +1,41 @@
+## Benford Analysis App Description ##
+This project contains a web application that allows a user to submit a data file with a numerical target column to be analyzed for compliance with Beford's Assertion. The instructions contained in this document will allow the user to install the application onto a server, but in order to run in a production environment, a middleware service such as Apache/ModWSGI or Nginx/Gunicorn should be used.
+
+
+## GitHub Repository Link ##
+https://github.com/kowabunga314/Inventory-L7.git
+
+
+## Inventory App Requirements ##
+- Python 3.7
+	- virtualenv
+- Git
+- Sqlite
+
+
+## Command Line Installation Instructions ##
+1. Create a folder to hold project and navigate into it
+	> mkdir benford_analyzer
+	> cd benford_analyzer
+2. Clone project into folder
+	> git clone https://github.com/kowabunga314/benford_analyzer
+3. Ensure virtualenv is installed
+	> pip install virtualenv
+4. Create virtual environment next to the project
+	> mkdir venv
+	> virtualenv venv/benford_analyzer
+5. Activate virtual environment
+	> source venv/benford_analyzer/bin/activate
+6. Navigate into project directory
+	> cd benford_analyzer
+7. Install project dependencies
+	> pip install -r requirements.txt
+8. Migrate Django database files to sqlite database
+	> python manage.py migrate
+9. Start Django server
+	> python manage.py runserver 127.0.0.1:8000
+9.5. Running server on a different address
+	- add your server's hostname or IP to ALLOWED_HOSTS in benford_analyzer/settings.py
+	- replace the home IP in the run command with your server's hostname
+
+
