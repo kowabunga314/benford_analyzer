@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from ingestor.config import SUPPORTED_SEPARATORS
 from .models import BenfordRequest, Ingestor
 
 

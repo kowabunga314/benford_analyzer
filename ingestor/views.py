@@ -1,14 +1,13 @@
 import re
 import io
-from math import floor, log10
 from django.http import JsonResponse
+from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
-
-from ingestor.models import BenfordRequest
+from ingestor.config import SUPPORTED_SEPARATORS
 from .models import Ingestor
 from .serializers import BenfordRequestSerializer, IngestorSerializer
 from .config import BENFORD_DISTRIBUTION as BD, BENFORD_TOLERANCE as BT
@@ -25,14 +24,19 @@ class Benford(APIView):
         Ingestor.objects.all().delete()
 
         # Serialize and validate input data
-        data = {'column': self.POST['column'], 'separator': self.POST['separator'], 'file': self.FILES['file']}
+        try:
+            data = {'column': self.POST['column'], 'separator': self.POST['separator'], 'file': self.FILES['file']}
+        except MultiValueDictKeyError as e:
+            return JsonResponse({'message': f'Request was missing {e.args}',
+                                 'supported_separators': SUPPORTED_SEPARATORS}, status=400)
+
         b_ser = BenfordRequestSerializer(data=data)
 
         if b_ser.is_valid():
             br = b_ser.save()
         else:
-            return JsonResponse({'message': 'Failed to parse file data. Please verify correct column and separator '
-                                            'values'}, status=400)
+            return JsonResponse({'error_messages': b_ser.errors, 'supported_separators': SUPPORTED_SEPARATORS},
+                                status=400)
 
         # Parse retrieved values
         try:
